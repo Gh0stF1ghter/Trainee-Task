@@ -8,10 +8,9 @@ namespace Warehouse_Trainee_Task.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        public required string Name { get; set; }
-        [ForeignKey("Department")]
-        public int DepartmentId { get; set; }
+        public required string FirstName { get; set; }
+        public string LastName { get; set; }
 
-        public ICollection<Department> Departments { get; set; }
+        public ICollection<Enrollment> Enrollments { get; }
     }
 }
