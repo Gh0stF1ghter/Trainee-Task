@@ -16,9 +16,9 @@ namespace Warehouse_Trainee_Task.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Worker>().ToTable(nameof(Worker));
-            modelBuilder.Entity<Department>().ToTable(nameof(Department));
-            modelBuilder.Entity<Product>().ToTable(nameof(Product));
+            modelBuilder.Entity<Worker>();
+            modelBuilder.Entity<Department>();
+            modelBuilder.Entity<Product>();
         }
     }
 }

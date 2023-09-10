@@ -10,6 +10,6 @@ namespace Warehouse_Trainee_Task.Models
         public required string Name { get; set; }
 
         public Product? Product { get; set; }
-        public ICollection<Enrollment> Enrollments { get; }
+        public ICollection<Worker> Workers { get; }
     }
 }

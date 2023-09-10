@@ -11,6 +11,6 @@ namespace Warehouse_Trainee_Task.Models
         public required string FirstName { get; set; }
         public string LastName { get; set; }
 
-        public ICollection<Enrollment> Enrollments { get; }
+        public ICollection<Department> Departments { get; }
     }
 }
