@@ -8,6 +8,7 @@ namespace Warehouse_Trainee_Task.Data
         //Test populator
         public static void Initialize(WarehouseContext context)
         {
+            context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
             try

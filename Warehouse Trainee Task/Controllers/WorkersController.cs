@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Warehouse_Trainee_Task.Data;
 using Warehouse_Trainee_Task.Models;
 
+//
 namespace Warehouse_Trainee_Task.Controllers
 {
     [Route("api/[controller]")]
@@ -16,82 +12,81 @@ namespace Warehouse_Trainee_Task.Controllers
     {
         private readonly WarehouseContext _context;
 
-        public WorkersController(WarehouseContext context)
+        private readonly ILogger<Worker> _logger;
+
+        public WorkersController(WarehouseContext context, ILogger<Worker> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: api/Workers
-        [HttpGet("Workers")]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Worker>>> GetWorkers()
         {
-          if (_context.Workers == null)
-          {
-              return NotFound();
-          }
+            if (_context.Workers == null)
+            {
+                return NotFound();
+            }
+
+            _logger.LogDebug("LogDebug ----- GetWorkers");
             return await _context.Workers.ToListAsync();
         }
 
         // GET: api/Workers/5
-        [HttpGet("Workers/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Worker>> GetWorker(int id)
         {
-          if (_context.Workers == null)
-          {
-              return NotFound();
-          }
             var worker = await _context.Workers.FindAsync(id);
-
-            if (worker == null)
+            if (worker is null)
             {
                 return NotFound();
             }
+
+            _logger.LogDebug("LogDebug ----- GetWorker");
 
             return worker;
         }
 
         // PUT: api/Workers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("Workers/{id}")]
-        public async Task<IActionResult> PutWorker(int id, Worker worker)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutWorker(int? id)
         {
-            if (id != worker.Id)
-            {
+            if (id == null)
                 return BadRequest();
-            }
 
-            _context.Entry(worker).State = EntityState.Modified;
+            var update = await _context.Workers.FirstOrDefaultAsync(s => s.Id == id);
 
-            try
+            if (await TryUpdateModelAsync<Worker>(update, "", s => s.FirstName, s => s.LastName))
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!WorkerExists(id))
+                try
                 {
-                    return NotFound();
+                    await _context.SaveChangesAsync();
+                    return Ok();
                 }
-                else
+                catch (DbUpdateException ex)
                 {
-                    throw;
+                    _logger.LogError(ex, "PutWorker Error");
                 }
             }
 
-            return NoContent();
+            _logger.LogDebug("LogDebug ----- PutWorker");
+            return BadRequest();
         }
 
         // POST: api/Workers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("Workers")]
+        [HttpPost]
         public async Task<ActionResult<Worker>> PostWorker(Worker worker)
         {
-          if (_context.Workers == null)
-          {
-              return Problem("Entity set 'WarehouseContext.Workers'  is null.");
-          }
+            if (_context.Workers == null)
+            {
+                return Problem("Entity set 'WarehouseContext.Workers'  is null.");
+            }
             _context.Workers.Add(worker);
             await _context.SaveChangesAsync();
+            _logger.LogDebug("LogDebug ----- PostWorker");
 
             return CreatedAtAction("GetWorker", new { id = worker.Id }, worker);
         }
@@ -100,12 +95,8 @@ namespace Warehouse_Trainee_Task.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteWorker(int id)
         {
-            if (_context.Workers == null)
-            {
-                return NotFound();
-            }
             var worker = await _context.Workers.FindAsync(id);
-            if (worker == null)
+            if (worker is null)
             {
                 return NotFound();
             }
@@ -113,7 +104,8 @@ namespace Warehouse_Trainee_Task.Controllers
             _context.Workers.Remove(worker);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            _logger.LogDebug("LogDebug ----- DeleteWorker");
+            return Ok();
         }
 
         private bool WorkerExists(int id)
