@@ -1,8 +1,7 @@
-using Microsoft.Build.Execution;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
-using Serilog.Formatting.Json;
 using Warehouse_Trainee_Task.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +15,10 @@ builder.Host.UseSerilog((context, config) =>
 builder.Services.AddDbContext<WarehouseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Warehouse", Version = "v1" });
+});
 
 var app = builder.Build();
 
@@ -38,7 +40,11 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Warehouse");
+        c.RoutePrefix = string.Empty;
+    });
 }
 
 app.UseExceptionHandler("/Error");
@@ -47,9 +53,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllers();
 
 app.Run();
