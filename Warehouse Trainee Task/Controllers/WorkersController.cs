@@ -51,28 +51,32 @@ namespace Warehouse_Trainee_Task.Controllers
         // PUT: api/Workers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutWorker(int? id)
+        public async Task<IActionResult> PutWorker(int? id, Worker worker)
         {
-            if (id == null)
-                return BadRequest();
-
-            var update = await _context.Workers.FirstOrDefaultAsync(s => s.Id == id);
-
-            if (await TryUpdateModelAsync<Worker>(update, "", s => s.FirstName, s => s.LastName))
+            if (id != worker.Id)
             {
-                try
+                return BadRequest();
+            }
+
+            _context.Entry(worker).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!WorkerExists(id))
                 {
-                    await _context.SaveChangesAsync();
-                    return Ok();
+                    return NotFound();
                 }
-                catch (DbUpdateException ex)
+                else
                 {
-                    _logger.LogError(ex, "PutWorker Error");
+                    throw;
                 }
             }
 
-            _logger.LogDebug("LogDebug ----- PutWorker");
-            return BadRequest();
+            return NoContent();
         }
 
         // POST: api/Workers
@@ -108,7 +112,7 @@ namespace Warehouse_Trainee_Task.Controllers
             return Ok();
         }
 
-        private bool WorkerExists(int id)
+        private bool WorkerExists(int? id)
         {
             return (_context.Workers?.Any(e => e.Id == id)).GetValueOrDefault();
         }
