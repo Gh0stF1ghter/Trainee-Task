@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Interfaces
 {
-    internal interface IWorkerManipulate
+    internal interface IRepository<TEntity> where TEntity : class
     {
+        ValueTask<TEntity> GetByIdAsync(int id);
+        Task<IEnumerable<TEntity>> GetAllAsync();
 
     }
 }
