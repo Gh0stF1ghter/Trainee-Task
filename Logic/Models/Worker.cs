@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace Warehouse_Trainee_Task.Models
+namespace Logic.Models
 {
     public class Worker
     {

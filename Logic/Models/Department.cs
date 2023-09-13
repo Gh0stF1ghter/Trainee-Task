@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Warehouse_Trainee_Task.Models
+namespace Logic.Models
 {
     public class Department
     {
@@ -10,6 +11,6 @@ namespace Warehouse_Trainee_Task.Models
         public required string Name { get; set; }
 
         public Product? Product { get; set; }
-        public ICollection<Worker> Workers { get; }
+        public ICollection<Worker> Workers { get; } = new List<Worker>();
     }
 }

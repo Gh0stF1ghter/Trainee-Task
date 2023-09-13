@@ -1,4 +1,4 @@
-﻿namespace Warehouse_Trainee_Task.Models
+﻿namespace Logic.Models
 {
     public class Product
     {
