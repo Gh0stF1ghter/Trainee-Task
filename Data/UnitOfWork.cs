@@ -1,0 +1,30 @@
+﻿using Data.Repositories;
+using Logic;
+using Logic.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Data
+{
+    public class UnitOfWork : IUnitOfWork
+    {
+        private readonly WarehouseContext _context;
+        private DepartmentRepository _departmentRepository;
+        private WorkerRepository _workerRepository;
+        private ProductRepository _productRepository;
+
+        public UnitOfWork(WarehouseContext context) =>
+            _context = context;
+
+        public IDepartmentRepository Departments => _departmentRepository ??= new DepartmentRepository(_context);
+        public IWorkerRepository Workers => _workerRepository ??= new WorkerRepository(_context);
+        public IProductRepository Products => _productRepository ??= new ProductRepository(_context);
+
+        public async Task<int> CommitAsync() => await _context.SaveChangesAsync();
+
+        public void Dispose() => _context.Dispose();
+    }
+}
