@@ -15,6 +15,10 @@ namespace Warehouse_Trainee_Task.Mapping
             CreateMap<DepartmentResource, Department>();
             CreateMap<WorkerResource, Worker>();
             CreateMap<ProductResource, Product>();
+
+            CreateMap<SaveDepartmentResource, Department>();
+            CreateMap<SaveWorkerResource, Worker>();
+            CreateMap<SaveProductResource, Product>();
         }
     }
 }
