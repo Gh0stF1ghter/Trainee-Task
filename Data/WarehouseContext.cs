@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Logic.Models;
+﻿using Logic.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Data
 {
@@ -16,9 +16,9 @@ namespace Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Worker>();
-            modelBuilder.Entity<Department>();
-            modelBuilder.Entity<Product>();
+            modelBuilder.Entity<Worker>().ToTable(nameof(Worker));
+            modelBuilder.Entity<Department>().ToTable(nameof(Department));
+            modelBuilder.Entity<Product>().ToTable(nameof(Product));
         }
     }
 }
