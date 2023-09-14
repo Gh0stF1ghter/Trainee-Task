@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Logic.Services
 {
-    internal interface IWorkerService
+    public interface IWorkerService
     {
         Task<IEnumerable<Worker>> GetWorkers();
         Task<Worker> GetWorkerById(int id);
         Task<Worker> CreateWorker(Worker worker);
-        Task<Worker> UpdateWorker(Worker worker, Worker oldWorker);
-        Task<Worker> DeleteWorker(Worker worker);
+        Task UpdateWorker(Worker worker, Worker oldWorker);
+        Task DeleteWorker(Worker worker);
     }
 }

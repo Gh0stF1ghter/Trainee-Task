@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,6 +12,6 @@ namespace Logic.Models
         public required string Name { get; set; }
 
         public Product? Product { get; set; }
-        public ICollection<Worker> Workers { get; } = new List<Worker>();
+        public ICollection<Worker> Workers { get; set; } = new Collection<Worker>();
     }
 }

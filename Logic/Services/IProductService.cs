@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Logic.Services
 {
-    internal interface IProductService
+    public interface IProductService
     {
         Task<IEnumerable<Product>> GetProducts();
         Task<Product> GetProductById(int id);
         Task<Product> CreateProduct(Product product);
-        Task<Product> UpdateProduct(Product product, Product oldProduct);
-        Task<Product> DeleteProduct(Product product);
+        Task UpdateProduct(Product product, Product oldProduct);
+        Task DeleteProduct(Product product);
 
     }
 }

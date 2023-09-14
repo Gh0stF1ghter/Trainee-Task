@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -13,6 +14,6 @@ namespace Logic.Models
         public string? LastName { get; set; }
 
         [JsonIgnore]
-        public ICollection<Department> Departments { get; set; } = new List<Department>();
+        public ICollection<Department> Departments { get; } = new Collection<Department>();
     }
 }
