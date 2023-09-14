@@ -5,8 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Warehouse_Trainee_Task.Data;
-using Warehouse_Trainee_Task.Models;
+using Data;
+using Services;
+using Logic.Services;
+using Logic.Models;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using AutoMapper;
+using Warehouse_Trainee_Task.Resources;
 
 namespace Warehouse_Trainee_Task.Controllers
 {
@@ -14,111 +19,59 @@ namespace Warehouse_Trainee_Task.Controllers
     [ApiController]
     public class DepartmentsController : ControllerBase
     {
-        private readonly WarehouseContext _context;
+        private readonly IDepartmentService _departmentService;
+        private readonly IMapper _mapper;
 
-        public DepartmentsController(WarehouseContext context)
+        public DepartmentsController(IDepartmentService departmentService, IMapper mapper)
         {
-            _context = context;
+            _departmentService = departmentService;
+            _mapper = mapper;
+
         }
 
         // GET: api/Departments
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Department>>> GetDepartments()
         {
-          if (_context.Departments == null)
-          {
-              return NotFound();
-          }
-            return await _context.Departments.ToListAsync();
+            var departments = await _departmentService.GetDepartments();
+            var departmentResources = _mapper.Map<IEnumerable<Department>, IEnumerable<DepartmentResource>>(departments);
+
+            return Ok(departmentResources);
         }
 
-        // GET: api/Departments/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Department>> GetDepartment(int id)
-        {
-          if (_context.Departments == null)
-          {
-              return NotFound();
-          }
-            var department = await _context.Departments.FindAsync(id);
+        //// GET: api/Departments/5
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<Department>> GetDepartment(int id)
+        //{
+         
+        //}
 
-            if (department == null)
-            {
-                return NotFound();
-            }
+        //// PUT: api/Departments/5
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutDepartment(int id, Department department)
+        //{
+            
+        //}
 
-            return department;
-        }
+        //// POST: api/Departments
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPost]
+        //public async Task<ActionResult<Department>> PostDepartment(Department department)
+        //{
+         
+        //}
 
-        // PUT: api/Departments/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutDepartment(int id, Department department)
-        {
-            if (id != department.Id)
-            {
-                return BadRequest();
-            }
+        //// DELETE: api/Departments/5
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteDepartment(int id)
+        //{
+            
+        //}
 
-            _context.Entry(department).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DepartmentExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Departments
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Department>> PostDepartment(Department department)
-        {
-          if (_context.Departments == null)
-          {
-              return Problem("Entity set 'WarehouseContext.Departments'  is null.");
-          }
-            _context.Departments.Add(department);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetDepartment", new { id = department.Id }, department);
-        }
-
-        // DELETE: api/Departments/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDepartment(int id)
-        {
-            if (_context.Departments == null)
-            {
-                return NotFound();
-            }
-            var department = await _context.Departments.FindAsync(id);
-            if (department == null)
-            {
-                return NotFound();
-            }
-
-            _context.Departments.Remove(department);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool DepartmentExists(int id)
-        {
-            return (_context.Departments?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        //private bool DepartmentExists(int id)
+        //{
+           
+        //}
     }
 }
