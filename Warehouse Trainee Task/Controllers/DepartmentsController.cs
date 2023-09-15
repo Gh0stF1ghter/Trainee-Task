@@ -25,10 +25,10 @@ namespace Warehouse_Trainee_Task.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DepartmentResource>>> GetDepartments()
         {
+            _logger.LogDebug("LogDebug ---------- GET Departments");
+
             var departments = await _departmentService.GetDepartments();
             var departmentResources = _mapper.Map<IEnumerable<Department>, IEnumerable<DepartmentResource>>(departments);
-
-            _logger.LogDebug("LogDebug ---------- GET Departments");
 
             return Ok(departmentResources);
         }
@@ -36,6 +36,7 @@ namespace Warehouse_Trainee_Task.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<DepartmentResource>> GetDepartment(int id)
         {
+            _logger.LogDebug("LogDebug ---------- GET DepartmentById");
 
             var department = await _departmentService.GetDepartmentById(id);
 
@@ -43,8 +44,6 @@ namespace Warehouse_Trainee_Task.Controllers
                 return NotFound();
 
             var departmentResource = _mapper.Map<Department, DepartmentResource>(department);
-
-            _logger.LogDebug("LogDebug ---------- GET DepartmentById");
 
             return Ok(departmentResource);
         }
@@ -64,8 +63,7 @@ namespace Warehouse_Trainee_Task.Controllers
             var mappedDepartment = _mapper.Map<SaveDepartmentResource, Department>(saveDepartmentResource);
             var newDepartment = await _departmentService.CreateDepartment(mappedDepartment);
 
-            var department = await _departmentService.GetDepartmentById(newDepartment.Id);
-            var departmentResource = _mapper.Map<Department, DepartmentResource>(department);
+            var departmentResource = _mapper.Map<Department, DepartmentResource>(newDepartment);
 
             _logger.LogDebug("LogDebug ---------- POST Department");
             return Ok(departmentResource);
@@ -84,6 +82,8 @@ namespace Warehouse_Trainee_Task.Controllers
                 _logger.LogError("LogError ------- PUT Department");
                 return BadRequest();
             }
+
+            _logger.LogDebug("LogDebug ---------- PUT Department");
 
             var oldDepartment = await _departmentService.GetDepartmentById(id);
 
@@ -105,6 +105,8 @@ namespace Warehouse_Trainee_Task.Controllers
         public async Task<IActionResult> DeleteDepartment(int id)
         {
             var department = await _departmentService.GetDepartmentById(id);
+
+            _logger.LogDebug("LogDebug ---------- DELETE Department");
 
             if (department is null)
                 return NotFound();

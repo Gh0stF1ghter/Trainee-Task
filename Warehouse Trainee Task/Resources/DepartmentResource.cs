@@ -6,8 +6,5 @@ namespace Warehouse_Trainee_Task.Resources
     {
         public int Id { get; set; }
         public required string Name { get; set; }
-
-        public ProductResource? Product { get; set; }
-        public ICollection<WorkerResource> Workers { get; set; } = new Collection<WorkerResource>();
     }
 }
