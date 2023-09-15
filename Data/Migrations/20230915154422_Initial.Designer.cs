@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(WarehouseContext))]
-    [Migration("20230915003832_Initial")]
+    [Migration("20230915154422_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -54,38 +54,6 @@ namespace Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Department", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Receiving"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Putaway"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Storage"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Picking"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "Packing"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "Shipping"
-                        });
                 });
 
             modelBuilder.Entity("Logic.Models.Product", b =>
@@ -108,38 +76,6 @@ namespace Data.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.ToTable("Product", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            DepartmentId = 5,
-                            Name = "Hi-Fi system"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            DepartmentId = 1,
-                            Name = "Constructor"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            DepartmentId = 6,
-                            Name = "Toolbox"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            DepartmentId = 5,
-                            Name = "Curtains"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            DepartmentId = 5,
-                            Name = "Monoblock"
-                        });
                 });
 
             modelBuilder.Entity("Logic.Models.Worker", b =>
@@ -160,38 +96,6 @@ namespace Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Worker", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            FirstName = "Joe",
-                            LastName = "Doe"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            FirstName = "Jane",
-                            LastName = "Doe"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            FirstName = "Charles",
-                            LastName = "Johnson"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            FirstName = "Alyx",
-                            LastName = "Vance"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            FirstName = "Jess",
-                            LastName = "Brown"
-                        });
                 });
 
             modelBuilder.Entity("DepartmentWorker", b =>
