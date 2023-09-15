@@ -1,6 +1,4 @@
-﻿using Logic.Models;
-
-namespace Warehouse_Trainee_Task.Resources
+﻿namespace Warehouse_Trainee_Task.Resources
 {
     public class ProductResource
     {

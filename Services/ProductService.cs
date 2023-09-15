@@ -1,11 +1,6 @@
 ﻿using Logic;
 using Logic.Models;
 using Logic.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services
 {
@@ -13,7 +8,7 @@ namespace Services
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public ProductService(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;        
+        public ProductService(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
         public async Task<IEnumerable<Product>> GetProducts() =>
     await _unitOfWork.Products.GetAllAsync();

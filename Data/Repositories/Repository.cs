@@ -26,7 +26,7 @@ namespace Data.Repositories
         public void Remove(TEntity entity) =>
             _context.Remove(entity);
 
-       public Task<TEntity>? SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate) =>
-            _context.Set<TEntity>().SingleOrDefaultAsync(predicate);
+        public Task<TEntity>? SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate) =>
+             _context.Set<TEntity>().SingleOrDefaultAsync(predicate);
     }
 }

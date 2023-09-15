@@ -1,10 +1,10 @@
+using Data;
+using Logic;
+using Logic.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
-using Data;
-using Logic;
-using Logic.Services;
 using Services;
 
 var builder = WebApplication.CreateBuilder(args);

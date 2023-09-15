@@ -128,8 +128,7 @@ namespace Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Product_DepartmentId",
                 table: "Product",
-                column: "DepartmentId",
-                unique: true);
+                column: "DepartmentId");
         }
 
         /// <inheritdoc />

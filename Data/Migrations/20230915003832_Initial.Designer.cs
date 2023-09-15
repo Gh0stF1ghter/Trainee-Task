@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(WarehouseContext))]
-    [Migration("20230914194025_Initial")]
+    [Migration("20230915003832_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -105,8 +105,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DepartmentId")
-                        .IsUnique();
+                    b.HasIndex("DepartmentId");
 
                     b.ToTable("Product", (string)null);
 
@@ -213,8 +212,8 @@ namespace Data.Migrations
             modelBuilder.Entity("Logic.Models.Product", b =>
                 {
                     b.HasOne("Logic.Models.Department", "Department")
-                        .WithOne("Product")
-                        .HasForeignKey("Logic.Models.Product", "DepartmentId")
+                        .WithMany("Products")
+                        .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -223,7 +222,7 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Logic.Models.Department", b =>
                 {
-                    b.Navigation("Product");
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

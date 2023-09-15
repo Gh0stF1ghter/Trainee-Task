@@ -6,7 +6,7 @@ namespace Warehouse_Trainee_Task.Mapping
 {
     public class MappingProfile : Profile
     {
-        public MappingProfile() 
+        public MappingProfile()
         {
             CreateMap<Department, DepartmentResource>();
             CreateMap<Worker, WorkerResource>();

@@ -1,7 +1,6 @@
 ﻿using Logic;
 using Logic.Models;
 using Logic.Services;
-using System.Data;
 
 namespace Services
 {
@@ -10,7 +9,7 @@ namespace Services
         private readonly IUnitOfWork _unitOfWork;
 
         public DepartmentService(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
-        
+
         public async Task<IEnumerable<Department>> GetDepartments() =>
             await _unitOfWork.Departments.GetAllAsync();
 

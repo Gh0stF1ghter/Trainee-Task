@@ -1,5 +1,4 @@
-﻿using Logic.Models;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace Warehouse_Trainee_Task.Resources
 {
