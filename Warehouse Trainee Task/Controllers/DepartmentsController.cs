@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Data;
-using Services;
-using Logic.Services;
+﻿using AutoMapper;
 using Logic.Models;
-using AutoMapper;
+using Logic.Services;
+using Microsoft.AspNetCore.Mvc;
 using Warehouse_Trainee_Task.Resources;
 using Warehouse_Trainee_Task.Validators;
-using Serilog;
 
 namespace Warehouse_Trainee_Task.Controllers
 {
@@ -31,9 +22,8 @@ namespace Warehouse_Trainee_Task.Controllers
             _logger = logger;
         }
 
-        // GET: api/Departments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Department>>> GetDepartments()
+        public async Task<ActionResult<IEnumerable<DepartmentResource>>> GetDepartments()
         {
             var departments = await _departmentService.GetDepartments();
             var departmentResources = _mapper.Map<IEnumerable<Department>, IEnumerable<DepartmentResource>>(departments);
@@ -43,29 +33,24 @@ namespace Warehouse_Trainee_Task.Controllers
             return Ok(departmentResources);
         }
 
-        // GET: api/Departments/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<Department>> GetDepartment(int id)
+        public async Task<ActionResult<DepartmentResource>> GetDepartment(int id)
         {
-            if (id == null)
-                return BadRequest();
 
             var department = await _departmentService.GetDepartmentById(id);
 
             if (department == null)
                 return NotFound();
 
-            var departmentResource = _mapper.Map<Department,  DepartmentResource>(department);
+            var departmentResource = _mapper.Map<Department, DepartmentResource>(department);
 
             _logger.LogDebug("LogDebug ---------- GET DepartmentById");
 
             return Ok(departmentResource);
         }
 
-        // POST: api/Departments
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Department>> PostDepartment([FromBody] SaveDepartmentResource saveDepartmentResource)
+        public async Task<ActionResult<DepartmentResource>> PostDepartment([FromBody] SaveDepartmentResource saveDepartmentResource)
         {
             var validator = new SaveDepartmentResourceValidator();
             var validationResult = await validator.ValidateAsync(saveDepartmentResource);
@@ -78,6 +63,7 @@ namespace Warehouse_Trainee_Task.Controllers
 
             var mappedDepartment = _mapper.Map<SaveDepartmentResource, Department>(saveDepartmentResource);
             var newDepartment = await _departmentService.CreateDepartment(mappedDepartment);
+
             var department = await _departmentService.GetDepartmentById(newDepartment.Id);
             var departmentResource = _mapper.Map<Department, DepartmentResource>(department);
 
@@ -85,8 +71,6 @@ namespace Warehouse_Trainee_Task.Controllers
             return Ok(departmentResource);
         }
 
-        // PUT: api/Departments/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDepartment(int id, [FromBody] SaveDepartmentResource saveDepartmentResource)
         {
@@ -117,16 +101,9 @@ namespace Warehouse_Trainee_Task.Controllers
         }
 
 
-        // DELETE: api/Departments/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
-            if (id == null)
-            {
-                _logger.LogError("LogError ------- DELETE Department");
-                return BadRequest();
-            }
-
             var department = await _departmentService.GetDepartmentById(id);
 
             if (department is null)

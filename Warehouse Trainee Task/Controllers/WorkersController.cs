@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Data;
+﻿using AutoMapper;
+using Logic.Models;
+using Logic.Services;
+using Microsoft.AspNetCore.Mvc;
+using Services;
+using Warehouse_Trainee_Task.Resources;
+using Warehouse_Trainee_Task.Validators;
 
 //
 namespace Warehouse_Trainee_Task.Controllers
@@ -9,111 +13,114 @@ namespace Warehouse_Trainee_Task.Controllers
     [ApiController]
     public class WorkersController : ControllerBase
     {
-        //private readonly WarehouseContext _context;
+        private readonly ILogger<WorkerService> _logger;
+        private readonly IMapper _mapper;
+        private readonly IWorkerService _service;
 
-        //private readonly ILogger<Worker> _logger;
+        public WorkersController(ILogger<WorkerService> logger, IMapper mapper, IWorkerService workerService)
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _service = workerService;
 
-        //public WorkersController(WarehouseContext context, ILogger<Worker> logger)
-        //{
-        //    _context = context;
-        //    _logger = logger;
-        //}
+        }
 
-        //// GET: api/Workers
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<Worker>>> GetWorkers()
-        //{
-        //    if (_context.Workers == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<WorkerResource>>> GetWorkers()
+        {
+            _logger.LogDebug("LogDebug ---------- GET Products");
 
-        //    _logger.LogDebug("LogDebug ----- GetWorkers");
-        //    return await _context.Workers.ToListAsync();
-        //}
+            var workers = await _service.GetWorkers();
 
-        //// GET: api/Workers/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<Worker>> GetWorker(int id)
-        //{
-        //    var worker = await _context.Workers.FindAsync(id);
-        //    if (worker is null)
-        //    {
-        //        return NotFound();
-        //    }
+            var workersResource = _mapper.Map<IEnumerable<Worker>, IEnumerable<WorkerResource>>(workers);
 
-        //    _logger.LogDebug("LogDebug ----- GetWorker");
+            return Ok(workersResource);
+        }
 
-        //    return worker;
-        //}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<WorkerResource>> GetWorker(int id)
+        {
+            _logger.LogDebug("LogDebug ---------- GET WorkerById");
 
-        //// PUT: api/Workers/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutWorker(int? id, Worker worker)
-        //{
-        //    if (id != worker.Id)
-        //    {
-        //        return BadRequest();
-        //    }
+            var worker = await _service.GetWorkerById(id);
 
-        //    _context.Entry(worker).State = EntityState.Modified;
+            if (worker == null)
+            {
+                return NotFound();
+            }
 
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!WorkerExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
+            var workerResource = _mapper.Map<Worker, WorkerResource>(worker);
 
-        //    return NoContent();
-        //}
+            return Ok(workerResource);
+        }
 
-        //// POST: api/Workers
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<Worker>> PostWorker(Worker worker)
-        //{
-        //    if (_context.Workers == null)
-        //    {
-        //        return Problem("Entity set 'WarehouseContext.Workers'  is null.");
-        //    }
-        //    _context.Workers.Add(worker);
-        //    await _context.SaveChangesAsync();
-        //    _logger.LogDebug("LogDebug ----- PostWorker");
+        [HttpPost]
+        public async Task<ActionResult<WorkerResource>> PostWorker([FromBody] SaveWorkerResource saveWorkerResource)
+        {
+            var validator = new SaveWorkerResourceValidator();
+            var validationResult = validator.Validate(saveWorkerResource);
 
-        //    return CreatedAtAction("GetWorker", new { id = worker.Id }, worker);
-        //}
+            if (!validationResult.IsValid)
+            {
+                _logger.LogError("LogError ---------- POST Worker");
+                return BadRequest();
+            }
 
-        //// DELETE: api/Workers/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteWorker(int id)
-        //{
-        //    var worker = await _context.Workers.FindAsync(id);
-        //    if (worker is null)
-        //    {
-        //        return NotFound();
-        //    }
+            _logger.LogDebug("LogDebug ---------- POST Worker");
 
-        //    _context.Workers.Remove(worker);
-        //    await _context.SaveChangesAsync();
+            var mappedWorker = _mapper.Map<SaveWorkerResource, Worker>(saveWorkerResource);
+            var newWorker = await _service.CreateWorker(mappedWorker);
 
-        //    _logger.LogDebug("LogDebug ----- DeleteWorker");
-        //    return Ok();
-        //}
+            var worker = await _service.GetWorkerById(newWorker.Id);
+            var workerResource = _mapper.Map<Worker, WorkerResource>(worker);
 
-        //private bool WorkerExists(int? id)
-        //{
-        //    return (_context.Workers?.Any(e => e.Id == id)).GetValueOrDefault();
-        //}
+            return Ok(workerResource);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutWorker(int id, [FromBody] SaveWorkerResource saveWorkerResource)
+        {
+            var validator = new SaveWorkerResourceValidator();
+
+            var validationResult = validator.Validate(saveWorkerResource);
+
+            var invalidResult = id == 0 || !validationResult.IsValid;
+
+            if (invalidResult)
+            {
+                _logger.LogError("LogError ---------- PUT Worker");
+                return BadRequest(validationResult.Errors);
+            }
+
+            _logger.LogDebug("LogDebug ---------- PUT Worker");
+
+
+            var oldWorker = await _service.GetWorkerById(id);
+
+            if (oldWorker == null)
+                return NotFound();
+
+            var newWorker = _mapper.Map<SaveWorkerResource, Worker>(saveWorkerResource);
+            await _service.UpdateWorker(newWorker, oldWorker);
+
+            var worker = _mapper.Map<Worker, WorkerResource>(newWorker);
+
+            return Ok(worker);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteWorker(int id)
+        {
+            _logger.LogDebug("LogDebug ---------- DELETE Worker");
+
+            var worker = await _service.GetWorkerById(id);
+
+            if (worker == null)
+                return NotFound();
+
+            await _service.DeleteWorker(worker);
+
+            return NoContent();
+        }
     }
 }

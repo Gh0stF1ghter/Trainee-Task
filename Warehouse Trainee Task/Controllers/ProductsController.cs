@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Logic.Models;
+using Logic.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Data;
+using Services;
+using Warehouse_Trainee_Task.Resources;
+using Warehouse_Trainee_Task.Validators;
 
 namespace Warehouse_Trainee_Task.Controllers
 {
@@ -13,111 +12,114 @@ namespace Warehouse_Trainee_Task.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        //private readonly WarehouseContext _context;
+        private readonly ILogger<ProductService> _logger;
+        private readonly IMapper _mapper;
+        private readonly IProductService _service;
 
-        //public ProductsController(WarehouseContext context)
-        //{
-        //    _context = context;
-        //}
+        public ProductsController(ILogger<ProductService> logger, IMapper mapper, IProductService productService)
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _service = productService;
 
-        //// GET: api/Products
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
-        //{
-        //  if (_context.Products == null)
-        //  {
-        //      return NotFound();
-        //  }
-        //    return await _context.Products.ToListAsync();
-        //}
+        }
 
-        //// GET: api/Products/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<Product>> GetProduct(int id)
-        //{
-        //  if (_context.Products == null)
-        //  {
-        //      return NotFound();
-        //  }
-        //    var product = await _context.Products.FindAsync(id);
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ProductResource>>> GetProducts()
+        {
+            _logger.LogDebug("LogDebug ---------- GET Products");
 
-        //    if (product == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var products = await _service.GetProducts();
 
-        //    return product;
-        //}
+            var productsResources = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductResource>>(products);
 
-        //// PUT: api/Products/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutProduct(int id, Product product)
-        //{
-        //    if (id != product.Id)
-        //    {
-        //        return BadRequest();
-        //    }
+            return Ok(productsResources);
+        }
 
-        //    _context.Entry(product).State = EntityState.Modified;
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ProductResource>> GetProduct(int id)
+        {
+            _logger.LogDebug("LogDebug ---------- GET ProductById");
 
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!ProductExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
+            var product = await _service.GetProductById(id);
 
-        //    return NoContent();
-        //}
+            if (product == null)
+            {
+                return NotFound();
+            }
 
-        //// POST: api/Products
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<Product>> PostProduct(Product product)
-        //{
-        //  if (_context.Products == null)
-        //  {
-        //      return Problem("Entity set 'WarehouseContext.Products'  is null.");
-        //  }
-        //    _context.Products.Add(product);
-        //    await _context.SaveChangesAsync();
+            var productResource = _mapper.Map<Product, ProductResource>(product);
 
-        //    return CreatedAtAction("GetProduct", new { id = product.Id }, product);
-        //}
+            return Ok(productResource);
+        }
 
-        //// DELETE: api/Products/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteProduct(int id)
-        //{
-        //    if (_context.Products == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var product = await _context.Products.FindAsync(id);
-        //    if (product == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpPost]
+        public async Task<ActionResult<ProductResource>> PostProduct(SaveProductResource saveProductResource)
+        {
+            var validator = new SaveProductResourceValidator();
+            var validationResult = validator.Validate(saveProductResource);
 
-        //    _context.Products.Remove(product);
-        //    await _context.SaveChangesAsync();
+            if (!validationResult.IsValid)
+            {
+                _logger.LogError("LogError ---------- POST Product");
+                return BadRequest();
+            }
 
-        //    return NoContent();
-        //}
+            _logger.LogDebug("LogDebug ---------- POST Product");
 
-        //private bool ProductExists(int id)
-        //{
-        //    return (_context.Products?.Any(e => e.Id == id)).GetValueOrDefault();
-        //}
+            var mappedProduct = _mapper.Map<SaveProductResource, Product>(saveProductResource);
+            var newProduct = await _service.CreateProduct(mappedProduct);
+
+            var product = await _service.GetProductById(newProduct.Id);
+            var productResource = _mapper.Map<Product, ProductResource>(product);
+
+            return Ok(productResource);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutProduct(int id, [FromBody] SaveProductResource saveProductResource)
+        {
+            var validator = new SaveProductResourceValidator();
+
+            var validationResult = validator.Validate(saveProductResource);
+
+            var invalidResult = id == 0 || !validationResult.IsValid;
+
+            if (invalidResult)
+            {
+                _logger.LogError("LogError ---------- PUT Product");
+                return BadRequest(validationResult.Errors);
+            }
+
+            _logger.LogDebug("LogDebug ---------- PUT Product");
+
+
+            var oldProduct = await _service.GetProductById(id);
+
+            if (oldProduct == null)
+                return NotFound();
+
+            var newProduct = _mapper.Map<SaveProductResource, Product>(saveProductResource);
+            await _service.UpdateProduct(newProduct, oldProduct);
+
+            var product = _mapper.Map<Product, ProductResource>(newProduct);
+
+            return Ok(product);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            _logger.LogDebug("LogDebug ---------- DELETE Product");
+
+            var product = await _service.GetProductById(id);
+
+            if (product == null)
+                return NotFound();
+
+            await _service.DeleteProduct(product);
+
+            return NoContent();
+        }
     }
 }
